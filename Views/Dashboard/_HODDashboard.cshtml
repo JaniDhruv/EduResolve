@@ -1,0 +1,102 @@
+@model EduResolve.ViewModels.HodDashboardViewModel
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-body">
+                <h5 class="card-title">Total Complaints</h5>
+                <p class="display-4 mb-0">@Model.TotalComplaints</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body">
+                <h5 class="card-title">Resolved Complaints</h5>
+                <p class="display-4 mb-0">@Model.ResolvedComplaints</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-dark h-100">
+            <div class="card-body">
+                <h5 class="card-title">Avg. Resolution Time (hrs)</h5>
+                <p class="display-4 mb-0">@Model.AverageResolutionHours</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="mt-4">Escalated Complaints</h2>
+@if (Model.EscalatedComplaints?.Any() == true)
+{
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Ticket</th>
+                    <th>Title</th>
+                    <th>Assigned To</th>
+                    <th>Status</th>
+                    <th>Escalated</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var complaint in Model.EscalatedComplaints)
+                {
+                    <tr class="table-warning">
+                        <td>#@complaint.Id</td>
+                        <td>@complaint.Title</td>
+                        <td>@(complaint.AssignedTo != null ? $"{complaint.AssignedTo.FirstName} {complaint.AssignedTo.LastName}" : "Unassigned")</td>
+                        <td><span class="badge badge-danger">Escalated</span></td>
+                        <td>@(complaint.EscalatedAt?.ToLocalTime().ToString("g") ?? "-")</td>
+                        <td>
+                            <a asp-controller="Complaints" asp-action="Details" asp-route-id="@complaint.Id" class="btn btn-sm btn-outline-primary">Investigate</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="text-muted">No complaints are currently escalated.</p>
+}
+
+<h2>Recent Department Complaints</h2>
+@if (Model.RecentComplaints?.Any() == true)
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead class="thead-light">
+                <tr>
+                    <th>Ticket</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var complaint in Model.RecentComplaints)
+                {
+                    <tr>
+                        <td>#@complaint.Id</td>
+                        <td>@complaint.Title</td>
+                        <td><span class="badge badge-secondary">@complaint.Status</span></td>
+                        <td>@complaint.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>
+                            <a asp-controller="Complaints" asp-action="Details" asp-route-id="@complaint.Id" class="btn btn-sm btn-outline-secondary">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="text-muted">No recent complaints for this department.</p>
+}

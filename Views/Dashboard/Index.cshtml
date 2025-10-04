@@ -1,0 +1,23 @@
+@model EduResolve.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1 class="mb-4">Welcome to EduResolve</h1>
+
+@if (Model.Role == "Student" && Model.StudentOverview != null)
+{
+    <partial name="_StudentDashboard" model="Model.StudentOverview" />
+}
+else if (Model.Role == "Teacher" && Model.TeacherOverview != null)
+{
+    <partial name="_TeacherDashboard" model="Model.TeacherOverview" />
+}
+else if ((Model.Role == "HOD" || Model.Role == "Admin") && Model.HodOverview != null)
+{
+    <partial name="_HODDashboard" model="Model.HodOverview" />
+}
+else
+{
+    <div class="alert alert-info">No dashboard data available. Please contact the administrator.</div>
+}
