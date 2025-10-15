@@ -1,0 +1,66 @@
+@model EduResolve.ViewModels.StudentDashboardViewModel
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-body">
+                <h5 class="card-title">Total Complaints</h5>
+                <p class="display-4 mb-0">@Model.TotalComplaints</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-warning h-100">
+            <div class="card-body">
+                <h5 class="card-title">Open Complaints</h5>
+                <p class="display-4 mb-0">@Model.OpenComplaints</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body">
+                <h5 class="card-title">Resolved Complaints</h5>
+                <p class="display-4 mb-0">@Model.ResolvedComplaints</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="mt-4">Recent Complaints</h2>
+@if (Model.RecentComplaints?.Any() == true)
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Ticket</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var complaint in Model.RecentComplaints)
+                {
+                    <tr>
+                        <td>#@complaint.Id</td>
+                        <td>@complaint.Title</td>
+                        <td>@complaint.Category</td>
+                        <td><span class="badge badge-info">@complaint.Status</span></td>
+                        <td>@complaint.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>
+                            <a asp-controller="Complaints" asp-action="Details" asp-route-id="@complaint.Id" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="text-muted">You haven't submitted any complaints yet.</p>
+}

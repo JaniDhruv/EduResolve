@@ -1,0 +1,111 @@
+@model EduResolve.ViewModels.ComplaintDetailViewModel
+@{
+    ViewData["Title"] = $"Complaint #{Model.Complaint.Id}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Complaint #@Model.Complaint.Id</h1>
+    <span class="badge badge-pill badge-info">@Model.Complaint.Status</span>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h4 class="card-title">@Model.Complaint.Title</h4>
+        <p class="card-text">@Model.Complaint.Description</p>
+        <dl class="row">
+            <dt class="col-sm-3">Category</dt>
+            <dd class="col-sm-9">@Model.Complaint.Category</dd>
+            <dt class="col-sm-3">Submitted by</dt>
+            <dd class="col-sm-9">@((Model.Complaint.SubmittedBy != null) ? $"{Model.Complaint.SubmittedBy.FirstName} {Model.Complaint.SubmittedBy.LastName}" : "-")</dd>
+            <dt class="col-sm-3">Assigned to</dt>
+            <dd class="col-sm-9">@((Model.Complaint.AssignedTo != null) ? $"{Model.Complaint.AssignedTo.FirstName} {Model.Complaint.AssignedTo.LastName}" : "-")</dd>
+            <dt class="col-sm-3">Created</dt>
+            <dd class="col-sm-9">@Model.Complaint.CreatedAt.ToLocalTime().ToString("f")</dd>
+            <dt class="col-sm-3">Last Updated</dt>
+            <dd class="col-sm-9">@(Model.Complaint.UpdatedAt?.ToLocalTime().ToString("f") ?? "Not updated yet")</dd>
+        </dl>
+
+        @if (Model.Attachments != null && Model.Attachments.Any())
+        {
+            <h5>Attachments</h5>
+            <ul class="list-unstyled">
+                @foreach (var attachment in Model.Attachments)
+                {
+                    <li><a href="@attachment.FilePath" target="_blank">Download</a></li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+@if (Model.CanUpdateStatus)
+{
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Update Status</h5>
+            @if (TempData["StatusError"] != null)
+            {
+                <div class="alert alert-danger">@TempData["StatusError"]</div>
+            }
+            <form asp-action="UpdateStatus" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="complaintId" value="@Model.Complaint.Id" />
+                <div class="form-row align-items-end">
+                    <div class="col-md-4">
+                        <label for="statusSelect">Status</label>
+                        <select id="statusSelect" name="newStatus" class="form-control" asp-items="Model.StatusOptions"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary mt-3">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Comments</h5>
+    </div>
+    <div class="card-body">
+        @if (Model.Comments != null && Model.Comments.Any())
+        {
+            <ul class="list-unstyled">
+                @foreach (var comment in Model.Comments)
+                {
+                    <li class="media mb-3">
+                        <div class="media-body">
+                            <h6 class="mt-0 mb-1">
+                                @(comment.User != null ? $"{comment.User.FirstName} {comment.User.LastName}" : "System")
+                                <small class="text-muted ml-2">@comment.CreatedAt.ToLocalTime().ToString("g")</small>
+                            </h6>
+                            <p>@comment.Content</p>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">No comments yet. Start the conversation below.</p>
+        }
+    </div>
+    <div class="card-footer">
+        @if (TempData["CommentError"] != null)
+        {
+            <div class="alert alert-danger">@TempData["CommentError"]</div>
+        }
+        <form asp-action="AddComment" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="complaintId" value="@Model.Complaint.Id" />
+            <div class="form-group">
+                <label for="commentText">Add Comment</label>
+                <textarea id="commentText" name="NewComment" class="form-control" rows="3" placeholder="Share an update or ask a question..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Post Comment</button>
+        </form>
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-link">Back to list</a>

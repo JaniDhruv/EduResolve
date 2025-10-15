@@ -1,0 +1,111 @@
+@model EduResolve.ViewModels.HodComplaintListViewModel
+@{
+    ViewData["Title"] = "Department Complaints";
+}
+
+<h1 class="mb-4">Department Complaints</h1>
+
+<form class="mb-4" method="get">
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="statusFilter">Status</label>
+            <select id="statusFilter" name="status" class="form-control" asp-items="Model.StatusOptions">
+                <option value="">All</option>
+            </select>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="teacherFilter">Assigned To</label>
+            <select id="teacherFilter" name="teacherId" class="form-control" asp-items="Model.TeacherOptions">
+                <option value="">All Teachers</option>
+            </select>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="studentFilter">Submitted By</label>
+            <select id="studentFilter" name="studentId" class="form-control" asp-items="Model.StudentOptions">
+                <option value="">All Students</option>
+            </select>
+        </div>
+        <div class="form-group col-md-1 d-flex align-items-end">
+            <button type="submit" class="btn btn-outline-secondary btn-block">Filter</button>
+        </div>
+    </div>
+</form>
+
+@if (TempData["ReassignError"] != null)
+{
+    <div class="alert alert-danger">@TempData["ReassignError"]</div>
+}
+@if (TempData["StatusError"] != null)
+{
+    <div class="alert alert-danger">@TempData["StatusError"]</div>
+}
+
+@if (Model.Complaints != null && Model.Complaints.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead class="thead-light">
+                <tr>
+                    <th>Ticket</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Submitted By</th>
+                    <th>Assigned To</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var complaint in Model.Complaints)
+                {
+                    <tr class="@(complaint.IsEscalated ? "table-warning" : string.Empty)">
+                        <td>#@complaint.Id</td>
+                        <td>@complaint.Title</td>
+                        <td><span class="badge badge-info">@complaint.Status</span></td>
+                        <td>@(complaint.SubmittedBy != null ? $"{complaint.SubmittedBy.FirstName} {complaint.SubmittedBy.LastName}" : "-")</td>
+                        <td>@(complaint.AssignedTo != null ? $"{complaint.AssignedTo.FirstName} {complaint.AssignedTo.LastName}" : "Unassigned")</td>
+                        <td>@complaint.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a asp-controller="Complaints" asp-action="Details" asp-route-id="@complaint.Id" class="btn btn-sm btn-outline-primary">View</a>
+                                <!-- <button class="btn btn-sm btn-outline-secondary" type="button" data-toggle="collapse" data-target="#statusForm@complaint.Id" aria-expanded="false" aria-controls="statusForm@complaint.Id">Status</button>
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-toggle="collapse" data-target="#assignForm@complaint.Id" aria-expanded="false" aria-controls="assignForm@complaint.Id">Assign</button> -->
+                            </div>
+                            <div class="collapse mt-2" id="statusForm@complaint.Id">
+                                <form asp-action="UpdateStatus" method="post" class="border rounded p-2">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="complaintId" value="@complaint.Id" />
+                                    <div class="form-group mb-2">
+                                        <select name="newStatus" class="form-control">
+                                            @foreach (var statusOption in Model.StatusOptions)
+                                            {
+                                                <option value="@statusOption.Value" selected="@(complaint.Status.ToString() == statusOption.Value ? "selected" : null)">@statusOption.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                                </form>
+                            </div>
+                            <div class="collapse mt-2" id="assignForm@complaint.Id">
+                                <form asp-action="Reassign" method="post" class="border rounded p-2">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="complaintId" value="@complaint.Id" />
+                                    <div class="form-group mb-2">
+                                        <select name="newAssigneeId" class="form-control" asp-items="Model.TeacherOptions">
+                                            <option value="">Select teacher</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-primary">Assign</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">No complaints match the selected filters.</div>
+}

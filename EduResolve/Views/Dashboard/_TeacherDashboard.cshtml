@@ -1,0 +1,66 @@
+@model EduResolve.ViewModels.TeacherDashboardViewModel
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-secondary h-100">
+            <div class="card-body">
+                <h5 class="card-title">New Complaints</h5>
+                <p class="display-4 mb-0">@Model.NewComplaints</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-warning h-100">
+            <div class="card-body">
+                <h5 class="card-title">In Progress</h5>
+                <p class="display-4 mb-0">@Model.InProgressComplaints</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body">
+                <h5 class="card-title">Resolved by Me</h5>
+                <p class="display-4 mb-0">@Model.ResolvedByMe</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="mt-4">Pending Complaints</h2>
+@if (Model.PendingComplaints?.Any() == true)
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Ticket</th>
+                    <th>Title</th>
+                    <th>Student</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var complaint in Model.PendingComplaints)
+                {
+                    <tr>
+                        <td>#@complaint.Id</td>
+                        <td>@complaint.Title</td>
+                        <td>@(complaint.SubmittedBy != null ? $"{complaint.SubmittedBy.FirstName} {complaint.SubmittedBy.LastName}" : "-")</td>
+                        <td><span class="badge badge-warning">@complaint.Status</span></td>
+                        <td>@complaint.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>
+                            <a asp-controller="Complaints" asp-action="Details" asp-route-id="@complaint.Id" class="btn btn-sm btn-outline-primary">Review</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="text-muted">No pending complaints require action.</p>
+}

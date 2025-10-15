@@ -1,0 +1,73 @@
+@model IEnumerable<EduResolve.Models.Complaint>
+@{
+    ViewData["Title"] = "Complaints";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Complaints</h1>
+    @if (User.IsInRole("Student") || User.IsInRole("Teacher"))
+    {
+        <a class="btn btn-primary" asp-action="Create">Submit Complaint</a>
+    }
+</div>
+
+<form class="form-inline mb-3" method="get">
+    <label class="mr-2" for="status">Status</label>
+    <select class="form-control mr-2" id="status" name="status" asp-items="(IEnumerable<SelectListItem>)ViewBag.StatusOptions">
+        <option value="">All</option>
+    </select>
+    @if (User.IsInRole("Teacher"))
+    {
+        <label class="mr-2" for="origin">Origin</label>
+        <select class="form-control mr-2" id="origin" name="origin" asp-items="(IEnumerable<SelectListItem>)ViewBag.OriginOptions">
+        </select>
+    }
+    <button type="submit" class="btn btn-outline-secondary">Filter</button>
+    @if (!string.IsNullOrEmpty(ViewBag.StatusFilter) || (User.IsInRole("Teacher") && !string.IsNullOrEmpty(ViewBag.OriginFilter)))
+    {
+        <a class="btn btn-link" asp-action="Index">Clear</a>
+    }
+</form>
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Ticket</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th>Created</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var complaint in Model)
+                {
+                    <tr class="@(complaint.IsEscalated ? "table-warning" : string.Empty)">
+                        <td>#@complaint.Id</td>
+                        <td>@complaint.Title</td>
+                        <td>@complaint.Category</td>
+                        <td>
+                            <span class="badge @(complaint.Status == EduResolve.Models.ComplaintStatus.Resolved || complaint.Status == EduResolve.Models.ComplaintStatus.Closed ? "badge-success" : "badge-info")">
+                                @complaint.Status
+                            </span>
+                        </td>
+                        <td>@(complaint.AssignedTo != null ? $"{complaint.AssignedTo.FirstName} {complaint.AssignedTo.LastName}" : "-")</td>
+                        <td>@complaint.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@complaint.Id" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">No complaints found for the selected criteria.</div>
+}
