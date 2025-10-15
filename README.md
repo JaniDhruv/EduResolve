@@ -8,7 +8,7 @@ EduResolve is our proof-of-concept startup project for the Web Application Devel
 - **Solution**: EduResolve centralizes complaint workflows, automates reminders and escalations, and gives each persona a focused dashboard to act quickly.
 - **Unique Edge**: Department-aware routing plus an automated escalation service that highlights unattended items, making it easy to prove measurable response times to stakeholders.
 
-## 2. Core Features (Meets “Minimum 3 Features” Requirement)
+## 2. Core Features
 
 1. **Role-Based Dashboards** – Personas (Student, Teacher, HOD, Admin) see tailored metrics and action items, improving decision-making and accountability.
 2. **Complaint Lifecycle Management** – End-to-end flow covering submission, attachments, threaded comments, and status transitions (`New → InProgress → Resolved/Closed → Reopened`).
@@ -111,7 +111,7 @@ Browse to the HTTPS URL printed in console (typically `https://localhost:5001`).
 
 ## 8. Demo Video Link
 
-- Placeholder: `_Add your YouTube / Google Drive link here_`
+(https://drive.google.com/file/d/1lfd-ugjH01SYaywrORYf_oOFzZbPkWH3/view?usp=sharing)
 
 ## 9. Folder Layout
 
